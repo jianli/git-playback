@@ -50,20 +50,21 @@ def function(window):
 
     while 1:
         window.clear()
+        max_y, max_x = window.getmaxyx()
         text = get_text(repo, position, file_dir)
         old_text = get_text(repo, position + 1, file_dir)
         added_lines = list(get_added_lines(old_text, text))
 
-        for line in range(window.getmaxyx()[0]):
+        for line in range(max_y - 1):
             color = curses.color_pair(0)
             if line in added_lines:
                 color = curses.color_pair(2)
             window.addstr(line, 0,
-                          text[line] if line < len(text) else '',
+                          text[line][:max_x - 1] if line < len(text) else '',
                           color,
                           )
-        window.addstr(window.getmaxyx()[0] - 1, 0,
-                      get_message(repo, position, file_dir),
+        window.addstr(max_y - 1, 0,
+                      get_message(repo, position, file_dir)[:max_x - 1],
                       curses.A_REVERSE)
         window.refresh()
 
