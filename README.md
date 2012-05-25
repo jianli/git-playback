@@ -3,6 +3,7 @@ Git playback is a command-line utility to play back, commit by commit, the histo
 ## Installation
 ```sh
 pip install gitpython
+cd ~
 git clone git@github.com:jianlius/git-playback.git
 ```
 
@@ -10,7 +11,7 @@ git clone git@github.com:jianlius/git-playback.git
 To inspect `~/repo/file.py` from the repository `~/repo/`
 ```sh
 cd ~/repo/
-git ~/git-playback/playback.py file.py
+~/git-playback/playback.py file.py
 ```
 and then press the following keys to navigate:
 * `b`ack one commit
