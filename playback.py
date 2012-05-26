@@ -25,15 +25,37 @@ def get_message(repo, position, file_dir):
     return ' '.join((commit(position), message))
 
 
-def get_added_lines(old_text, text):
+def get_added_rows(old_text, text):
     diffs = difflib.ndiff(old_text, text)
-    line = 0
+    row = 0
     for diff in diffs:
         code = diff[:2]
         if code == '+ ':
-            yield line
+            yield row
         if code in ('  ', '+ '):
-            line += 1
+            row += 1
+
+
+def display_line(window, row, line, color, col_width=80):
+    """
+    Display all lines in fixed_width columns.
+    """
+    max_y, max_x = window.getmaxyx()
+    display_column, display_row = divmod(row, max_y - 1)
+    if display_column * col_width + col_width > max_x - 1:
+        # Don't display line if it doesn't completely fit on the screen.
+        return False
+    window.addstr(display_row, display_column * col_width,
+                  line[:col_width],
+                  color,
+                  )
+
+
+def display_prompt(window, message):
+    max_y, max_x = window.getmaxyx()
+    window.addstr(max_y - 1, 0,
+                  message[:max_x - 1],
+                  curses.A_REVERSE)
 
 
 def function(window):
@@ -53,27 +75,23 @@ def function(window):
         max_y, max_x = window.getmaxyx()
         text = get_text(repo, position, file_dir)
         old_text = get_text(repo, position + 1, file_dir)
-        added_lines = list(get_added_lines(old_text, text))
+        added_rows = list(get_added_rows(old_text, text))
 
-        for line in range(max_y - 1):
+        # `row` is the line number and `line` is the line text.
+        for row, line in enumerate(text):
             color = curses.color_pair(0)
-            if line in added_lines:
+            if row in added_rows:
                 color = curses.color_pair(2)
-            window.addstr(line, 0,
-                          text[line][:max_x - 1] if line < len(text) else '',
-                          color,
-                          )
-        window.addstr(max_y - 1, 0,
-                      get_message(repo, position, file_dir)[:max_x - 1],
-                      curses.A_REVERSE)
+            display_line(window, row, line, color)
+        display_prompt(window, get_message(repo, position, file_dir))
         window.refresh()
+        if (playing or rewinding) and added_rows:
+            time.sleep(1)
 
         if rewinding:
             c = curses.KEY_LEFT
-            time.sleep(0.1)
         elif playing:
             c = curses.KEY_RIGHT
-            time.sleep(0.1)
         else:
             c = window.getch()
 
