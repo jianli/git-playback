@@ -1,4 +1,4 @@
-Git playback is a command-line utility to play back, commit by commit, the history of any git-controlled file.
+Git playback is a command-line utility to play back or step through, commit by commit, the history of any git-controlled file.
 
 ## Installation
 ```sh
@@ -8,14 +8,18 @@ git clone git@github.com:jianlius/git-playback.git
 ```
 
 ## Usage
-To inspect `~/repo/file.py` from the repository `~/repo/`
+To inspect a file `~/repo/path/to/file.py` from the repository `~/repo/`
 ```sh
 cd ~/repo/
-~/git-playback/playback.py file.py
+~/git-playback/playback.py path/to/file.py
 ```
 and then press the following keys to navigate:
-* `b`ack one commit
-* `f`orward one commit
 * `r`ewind
 * `p`lay
+* `b`ack one commit
+* `f`orward one commit
 * `q`uit
+
+### Tips
+* Git playback works better with files that have been edited relatively frequently in your commit history.
+* Try to get the entire file on your screen by either increasing the size of your terminal window or reducing your font size.
