@@ -43,7 +43,8 @@ def display_line(window, row, line, color, col_width=80):
     max_y, max_x = window.getmaxyx()
     display_column, display_row = divmod(row, max_y - 1)
     if display_column * col_width + col_width > max_x - 1:
-        # Don't display line if it doesn't completely fit on the screen.
+        # Don't display line if it doesn't completely fit on the
+        # screen.
         return False
     window.addstr(display_row, display_column * col_width,
                   line[:col_width],
@@ -63,8 +64,17 @@ def function(window):
     curses.init_pair(1, curses.COLOR_RED, -1)
     curses.init_pair(2, curses.COLOR_GREEN, -1)
 
-    repo = git.Repo(os.getcwd(), odbt=git.GitCmdObjectDB)
-    file_dir = sys.argv[1]
+    # Because this script is run through git alias, os.getcwd() will
+    # actually return the top level of the git repo instead of the
+    # true cwd. Therefore, the alias command needs to pass in
+    # $GIT_PREFIX in order to get the true cwd
+    top_level = os.getcwd()
+    file_dir = os.path.join(
+        sys.argv[1],  # $GIT_PREFIX passed in by git alias
+        sys.argv[2],  # relative path
+        )
+
+    repo = git.Repo(top_level, odbt=git.GitCmdObjectDB)
 
     position = 0
     playing = False

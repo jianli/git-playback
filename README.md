@@ -5,13 +5,14 @@ Git playback is a command-line utility to play back or step through, commit by c
 pip install gitpython
 cd ~
 git clone git@github.com:jianlius/git-playback.git
+git config --global alias.playback '!~/git-playback/playback.py ${GIT_PREFIX:-.}'
 ```
 
 ## Usage
 To inspect a file `~/repo/path/to/file.py` from the repository `~/repo/`
 ```sh
 cd ~/repo/
-~/git-playback/playback.py path/to/file.py
+git playback path/to/file.py
 ```
 and then press the following keys to navigate:
 * `r`ewind
