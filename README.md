@@ -1,4 +1,4 @@
-Git playback is a command-line utility to play back or step through, commit by commit, the history of any git-controlled file.
+**Git playback** is a `git` command to play back or step through, commit by commit, the history of any git-controlled file.
 
 ## Installation
 ```sh
@@ -20,7 +20,7 @@ and then press the following keys to navigate:
 * `b`ack one commit
 * `f`orward one commit
 * `Ctrl` + `n`ext line
-* 'Ctrl` + `p`revious line
+* `Ctrl` + `p`revious line
 * `q`uit
 
 ### Tips
