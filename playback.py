@@ -20,9 +20,11 @@ def get_text(repo, position, file_dir):
 
 
 def get_message(repo, position, file_dir):
+    author = repo.git.show(commit(position), format='%ae'). \
+        replace('\r', '').split('\n')[0]
     message = repo.git.show(commit(position), oneline=True). \
         replace('\r', '').split('\n')[0]
-    return ' '.join((commit(position), message))
+    return ' '.join((commit(position), author, message))
 
 
 def display_line(window, row, line, color, col_width=82):
