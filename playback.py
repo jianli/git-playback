@@ -25,18 +25,7 @@ def get_message(repo, position, file_dir):
     return ' '.join((commit(position), message))
 
 
-def get_added_rows(old_text, text):
-    diffs = difflib.ndiff(old_text, text)
-    row = 0
-    for diff in diffs:
-        code = diff[:2]
-        if code == '+ ':
-            yield row
-        if code in ('  ', '+ '):
-            row += 1
-
-
-def display_line(window, row, line, color, col_width=80):
+def display_line(window, row, line, color, col_width=82):
     """
     Display all lines in fixed_width columns.
     """
@@ -82,20 +71,29 @@ def function(window):
 
     while 1:
         window.clear()
-        max_y, max_x = window.getmaxyx()
-        text = get_text(repo, position, file_dir)
+
         old_text = get_text(repo, position + 1, file_dir)
-        added_rows = list(get_added_rows(old_text, text))
+        text = get_text(repo, position, file_dir)
+        diff = list(difflib.ndiff(old_text, text))
 
         # `row` is the line number and `line` is the line text.
-        for row, line in enumerate(text):
-            color = curses.color_pair(0)
-            if row in added_rows:
+        row = 0
+        for line in diff:
+            code = line[:2]
+            if code == '? ':
+                continue
+            elif code == '+ ':
                 color = curses.color_pair(2)
+            elif code == '- ':
+                color = curses.color_pair(1)
+            else:
+                color = curses.color_pair(0)
             display_line(window, row, line, color)
+            row += 1
         display_prompt(window, get_message(repo, position, file_dir))
+
         window.refresh()
-        if (playing or rewinding) and added_rows:
+        if (playing or rewinding) and old_text != text:
             time.sleep(1)
 
         if rewinding:
@@ -114,13 +112,11 @@ def function(window):
                 position += 1
             else:
                 rewinding = False
-                curses.flash()
         elif c in (curses.KEY_RIGHT, ord('f')):
             if get_text(repo, position - 1, file_dir):
                 position -= 1
             else:
                 playing = False
-                curses.flash()
         elif c == ord('q'):
             break
 
