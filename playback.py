@@ -68,6 +68,7 @@ def function(window):
     repo = git.Repo(top_level, odbt=git.GitCmdObjectDB)
 
     position = 0
+    first_row = 0  # Controls scrolling.
     playing = False
     rewinding = False
 
@@ -76,22 +77,20 @@ def function(window):
 
         old_text = get_text(repo, position + 1, file_dir)
         text = get_text(repo, position, file_dir)
-        diff = list(difflib.ndiff(old_text, text))
+        diff = [line for line in list(difflib.ndiff(old_text, text))
+                if line[:2] != '? ']
 
         # `row` is the line number and `line` is the line text.
-        row = 0
-        for line in diff:
+        # Whatever `first_row` is, we always want to show at least one line.
+        for row, line in enumerate(diff[min(first_row, len(diff) - 1):]):
             code = line[:2]
-            if code == '? ':
-                continue
-            elif code == '+ ':
+            if code == '+ ':
                 color = curses.color_pair(2)
             elif code == '- ':
                 color = curses.color_pair(1)
             else:
                 color = curses.color_pair(0)
             display_line(window, row, line, color)
-            row += 1
         display_prompt(window, get_message(repo, position, file_dir))
 
         window.refresh()
@@ -119,6 +118,16 @@ def function(window):
                 position -= 1
             else:
                 playing = False
+        elif c == ord('n') - 96:  # ctrl + n
+            if first_row < len(diff) - 1:
+                first_row += 1
+            else:
+                curses.flash()
+        elif c == ord('p') - 96:  # ctrl + p
+            if first_row > 0:
+                first_row -= 1
+            else:
+                curses.flash()
         elif c == ord('q'):
             break
 

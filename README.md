@@ -19,6 +19,8 @@ and then press the following keys to navigate:
 * `p`lay
 * `b`ack one commit
 * `f`orward one commit
+* `Ctrl` + `n`ext line
+* 'Ctrl` + `p`revious line
 * `q`uit
 
 ### Tips
