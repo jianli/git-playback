@@ -118,12 +118,12 @@ def function(window):
                 position -= 1
             else:
                 playing = False
-        elif c == ord('n') - 96:  # ctrl + n
+        elif c in (curses.KEY_DOWN, ord('n') - 96):  # ctrl + n
             if first_row < len(diff) - 1:
                 first_row += 1
             else:
                 curses.flash()
-        elif c == ord('p') - 96:  # ctrl + p
+        elif c in (curses.KEY_UP, ord('p') - 96):  # ctrl + p
             if first_row > 0:
                 first_row -= 1
             else:
