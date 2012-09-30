@@ -22,7 +22,3 @@ and then press the following keys to navigate:
 * `Ctrl` + `n`ext line
 * `Ctrl` + `p`revious line
 * `q`uit
-
-### Tips
-* Git playback works better with files that have been edited relatively frequently in your commit history.
-* Try to get the entire file on your screen by either increasing the size of your terminal window or reducing your font size.
