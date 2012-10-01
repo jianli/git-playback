@@ -63,11 +63,14 @@ def function(window):
 
     position = len(commits) - 1
     first_row = 0
+    next_refresh = 0
+    c = 0
     playing = False
     rewinding = False
 
     while 1:
-        window.clear()
+        if c != curses.ERR:  # clear screen unless nothing changed
+            window.clear()
 
         commit = commits[position]
 
@@ -88,24 +91,28 @@ def function(window):
                 color = curses.color_pair(0)
             display_line(window, row, line, color)
         display_prompt(window, get_message(repo, commit, file_dir))
+        while time.time() < next_refresh:
+            pass
         window.refresh()
 
-        if (playing or rewinding):
-            time.sleep(.1)
-
-        if rewinding:
-            c = curses.KEY_LEFT
-        elif playing:
-            c = curses.KEY_RIGHT
+        # get keyboard input
+        window.nodelay(1)  # don't wait for input
+        c = window.getch()
+        if (playing or rewinding) and c == curses.ERR:
+            next_refresh = time.time() + 0.3
+            if playing:
+                c = curses.KEY_RIGHT
+            elif rewinding:
+                c = curses.KEY_LEFT
         else:
-            c = window.getch()
-            if c == ord('r'):
-                rewinding = True
-            elif c == ord('p'):
-                playing = True
+            playing = rewinding = False
 
-        # Change display parameters based on keyboard input
-        if c in (curses.KEY_LEFT, ord('b')):
+        # Change state parameters based on keyboard input
+        if c == ord('r'):
+            rewinding = True
+        elif c == ord('p'):
+            playing = True
+        elif c in (curses.KEY_LEFT, ord('b')):
             if 0 <= position - 1 < len(commits):
                 position -= 1
             else:
