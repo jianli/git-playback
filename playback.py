@@ -14,9 +14,9 @@ def get_text(repo, commit, file_dir):
 
 def get_message(repo, commit, file_dir):
     short_commit = commit[:7]
-    author = '(%s)' % repo.git.log(commit, format='%ae').replace(
+    author = '(%s)' % repo.git.log(commit, n=1, format='%ae').replace(
         '\r', '').split('\n')[0]
-    message = repo.git.log(commit, oneline=True).replace(
+    message = repo.git.log(commit, n=1, oneline=True).replace(
         '\r', '').split('\n')[0][8:]
     return ' '.join((short_commit, file_dir, author, message))
 
