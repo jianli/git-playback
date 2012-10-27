@@ -65,7 +65,7 @@ def function(window):
     commit = 0
     first_row = 0
     next_refresh = 0
-    c = 0
+    key = 0
     playing = False
     rewinding = False
     diff = []
@@ -73,38 +73,38 @@ def function(window):
     while 1:
         # get keyboard input
         window.nodelay(1)  # don't wait for input
-        c = window.getch()
-        if (playing or rewinding) and c == curses.ERR:
+        key = window.getch()
+        if (playing or rewinding) and key == curses.ERR:
             next_refresh = time.time() + 0.3
             if playing:
-                c = curses.KEY_RIGHT
+                key = curses.KEY_RIGHT
             elif rewinding:
-                c = curses.KEY_LEFT
+                key = curses.KEY_LEFT
         else:
             playing = rewinding = False
 
         # Change state parameters based on keyboard input
-        if c == ord('r'):
+        if key == ord('r'):
             rewinding = True
-        elif c == ord('p'):
+        elif key == ord('p'):
             playing = True
-        elif c in (curses.KEY_LEFT, ord('b')):
+        elif key in (curses.KEY_LEFT, ord('b')):
             if 0 <= position - 1 < len(commits):
                 position -= 1
             else:
                 rewinding = False
-        elif c in (curses.KEY_RIGHT, ord('f')):
+        elif key in (curses.KEY_RIGHT, ord('f')):
             if 0 <= position + 1 < len(commits):
                 position += 1
             else:
                 playing = False
-        elif c in (curses.KEY_DOWN, ord('n') - 96):  # ctrl + n
+        elif key in (curses.KEY_DOWN, ord('n') - 96):  # ctrl + n
             if first_row < len(diff) - 1:
                 first_row += 1
-        elif c in (curses.KEY_UP, ord('p') - 96):  # ctrl + p
+        elif key in (curses.KEY_UP, ord('p') - 96):  # ctrl + p
             if first_row > 0:
                 first_row -= 1
-        elif c == ord('q'):
+        elif key == ord('q'):
             return
 
         if commit == commits[position]:
