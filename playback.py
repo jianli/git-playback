@@ -62,39 +62,15 @@ def function(window):
         return
 
     position = len(commits) - 1
+    commit = 0
     first_row = 0
     next_refresh = 0
     c = 0
     playing = False
     rewinding = False
+    diff = []
 
     while 1:
-        if c != curses.ERR:  # clear screen unless nothing changed
-            window.clear()
-
-        commit = commits[position]
-
-        old_text = get_text(repo, commits[position - 1], file_dir) \
-            if position - 1 >= 0 else []
-        text = get_text(repo, commit, file_dir)
-        diff = [line for line in list(difflib.ndiff(old_text, text))
-                if line[:2] != '? ']
-
-        # `row` is the line number and `line` is the line text.
-        for row, line in enumerate(diff[min(first_row, len(diff) - 1):]):
-            code = line[:2]
-            if code == '+ ':
-                color = curses.color_pair(2)
-            elif code == '- ':
-                color = curses.color_pair(1)
-            else:
-                color = curses.color_pair(0)
-            display_line(window, row, line, color)
-        display_prompt(window, get_message(repo, commit, file_dir))
-        while time.time() < next_refresh:
-            pass
-        window.refresh()
-
         # get keyboard input
         window.nodelay(1)  # don't wait for input
         c = window.getch()
@@ -130,5 +106,34 @@ def function(window):
                 first_row -= 1
         elif c == ord('q'):
             return
+
+        if commit == commits[position]:
+            time.sleep(.01)
+            continue
+
+        commit = commits[position]
+        window.clear()
+
+        old_text = get_text(repo, commits[position - 1], file_dir) \
+            if position - 1 >= 0 else []
+        text = get_text(repo, commit, file_dir)
+        diff = [line for line in list(difflib.ndiff(old_text, text))
+                if line[:2] != '? ']
+
+        # `row` is the line number and `line` is the line text.
+        for row, line in enumerate(diff[min(first_row, len(diff) - 1):]):
+            code = line[:2]
+            if code == '+ ':
+                color = curses.color_pair(2)
+            elif code == '- ':
+                color = curses.color_pair(1)
+            else:
+                color = curses.color_pair(0)
+            display_line(window, row, line, color)
+        display_prompt(window, get_message(repo, commit, file_dir))
+        while time.time() < next_refresh:
+            pass
+        window.refresh()
+
 
 curses.wrapper(function)
