@@ -84,6 +84,7 @@ def function(window):
             playing = rewinding = False
 
         # Change state parameters based on keyboard input
+        first_row_delta = 0
         if key == ord('r'):
             rewinding = True
         elif key == ord('p'):
@@ -100,18 +101,19 @@ def function(window):
                 playing = False
         elif key in (curses.KEY_DOWN, ord('n') - 96):  # ctrl + n
             if first_row < len(diff) - 1:
-                first_row += 1
+                first_row_delta = 1
         elif key in (curses.KEY_UP, ord('p') - 96):  # ctrl + p
             if first_row > 0:
-                first_row -= 1
+                first_row_delta = -1
         elif key == ord('q'):
             return
 
-        if commit == commits[position]:
+        if commit == commits[position] and not first_row_delta:
             time.sleep(.01)
             continue
 
         commit = commits[position]
+        first_row += first_row_delta
         window.clear()
 
         old_text = get_text(repo, commits[position - 1], file_dir) \
