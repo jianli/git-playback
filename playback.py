@@ -51,7 +51,7 @@ def function(window):
     file_dir = os.path.join(
         sys.argv[1],  # $GIT_PREFIX passed in by git alias
         sys.argv[2],  # relative path
-        )
+    )
     repo = git.Repo(top_level, odbt=git.GitCmdObjectDB)
 
     try:
