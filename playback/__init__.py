@@ -7,18 +7,18 @@ import sys
 import time
 
 
-def get_text(repo, commit, file_dir):
-    return repo.git.show('%s:%s' % (commit, file_dir)).replace(
+def get_text(repo, sha1, file_path):
+    return repo.git.show('%s:%s' % (sha1, file_path)).replace(
         '\r', '').split('\n')
 
 
-def get_message(repo, commit, file_dir):
-    short_commit = commit[:7]
-    author = '(%s)' % repo.git.log(commit, n=1, format='%ae').replace(
+def get_message(repo, sha1, file_path):
+    short_sha1 = sha1[:7]
+    author = '(%s)' % repo.git.log(sha1, n=1, format='%ae').replace(
         '\r', '').split('\n')[0]
-    message = repo.git.log(commit, n=1, oneline=True).replace(
+    message = repo.git.log(sha1, n=1, oneline=True).replace(
         '\r', '').split('\n')[0][8:]
-    return ' '.join((short_commit, file_dir, author, message))
+    return ' '.join((short_sha1, file_path, author, message))
 
 
 def display_line(window, row, line, color, col_width=82):
@@ -39,6 +39,32 @@ def display_prompt(window, message):
     window.addstr(max_y - 1, 0, message[:max_x - 1], curses.A_REVERSE)
 
 
+def extract_filename(log):
+    """
+    Ugly hack to extract file path from `git log --follow --numstat` output
+
+    The last line of each log entry is either (tab-separated)
+
+    1       1       bar.py
+
+    or
+
+    1       1       foo.py => bar.py
+
+    or
+
+    1       1       dir/{foo.py => bar.py}
+
+    and we want the full path of the right hand side.
+    """
+    last_line = log.strip().split('\n')[-1].split('\t')
+    assert len(last_line) == 3
+    text = last_line[-1]
+    prefix = text.split('{')[0] if ('{' in text) else ''
+    suffix = text.split('=>')[-1].strip().strip('}')
+    return prefix + suffix
+
+
 def function(window):
     curses.use_default_colors()
     curses.init_pair(1, curses.COLOR_RED, -1)
@@ -47,12 +73,19 @@ def function(window):
     repo = git.Repo(os.getcwd(), odbt=git.GitCmdObjectDB)
     top_level = repo.git.rev_parse(show_toplevel=True)
     cwd = os.path.relpath(os.getcwd(), top_level)
-    file_dir = os.path.join(cwd, sys.argv[1])
+    file_path = os.path.join(cwd, sys.argv[1])
 
     try:
-        # Assume that file_dir is a path instead of a ref; it doesn't seem
-        # possible to use ' -- ' in GitPython.
-        commits = repo.git.log(file_dir, format="%H", reverse=True).split('\n')
+        # `commits` is a list of `(sha1, file_path)` tuples where `file_path`
+        # is variable because we are following files renames. Adding the '!'
+        # into the format is a hack to help us delimit sha1s in the git output.
+        commits = [
+            (log.split()[0], extract_filename(log))
+            for log in repo.git.log(
+                file_path, numstat=True, follow=True, format="!%H")
+            .strip('!').split('!')
+        ]
+        commits.reverse()  # Since `git log --reverse --follow` doesn't work
     except git.exc.GitCommandError:
         return
 
@@ -111,9 +144,9 @@ def function(window):
         first_row += first_row_delta
         window.clear()
 
-        old_text = get_text(repo, commits[position - 1], file_dir) \
+        old_text = get_text(repo, *commits[position - 1]) \
             if position - 1 >= 0 else []
-        text = get_text(repo, commit, file_dir)
+        text = get_text(repo, *commit)
         diff = [line for line in list(difflib.ndiff(old_text, text))
                 if line[:2] != '? ']
 
@@ -127,7 +160,7 @@ def function(window):
             else:
                 color = curses.color_pair(0)
             display_line(window, row, line, color)
-        display_prompt(window, get_message(repo, commit, file_dir))
+        display_prompt(window, get_message(repo, *commit))
         while time.time() < next_refresh:
             pass
         window.refresh()
