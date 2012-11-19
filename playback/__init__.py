@@ -75,19 +75,16 @@ def function(window):
     cwd = os.path.relpath(os.getcwd(), top_level)
     file_path = os.path.join(cwd, sys.argv[1])
 
-    try:
-        # `commits` is a list of `(sha1, file_path)` tuples where `file_path`
-        # is variable because we are following files renames. Adding the '!'
-        # into the format is a hack to help us delimit sha1s in the git output.
-        commits = [
-            (log.split()[0], extract_filename(log))
-            for log in repo.git.log(
-                file_path, numstat=True, follow=True, format="!%H")
-            .strip('!').split('!')
-        ]
-        commits.reverse()  # Since `git log --reverse --follow` doesn't work
-    except git.exc.GitCommandError:
-        return
+    # `commits` is a list of `(sha1, file_path)` tuples where `file_path` is
+    # variable because we are following files renames. Adding the '!' into the
+    # format is a hack to help us delimit sha1s in the git output.
+    commits = [
+        (log.split()[0], extract_filename(log))
+        for log in repo.git.log(
+            file_path, numstat=True, follow=True, format='!%H')
+        .strip('!').split('!')
+    ]
+    commits.reverse()  # Since `git log --reverse --follow` doesn't work
 
     position = len(commits) - 1
     commit = 0
@@ -167,7 +164,11 @@ def function(window):
 
 
 def playback():
-    curses.wrapper(function)
+    try:
+        curses.wrapper(function)
+    except git.exc.GitCommandError as err:
+        print >> sys.stderr, 'Error: %s' % err
+        return 1
 
 
 if __name__ == '__main__':
