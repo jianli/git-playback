@@ -138,4 +138,9 @@ def function(window):
         window.refresh()
 
 
-curses.wrapper(function)
+def playback():
+    curses.wrapper(function)
+
+
+if __name__ == '__main__':
+    sys.exit(playback())
