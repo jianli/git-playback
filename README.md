@@ -2,10 +2,7 @@
 
 ## Installation
 ```sh
-pip install gitpython
-cd ~
-git clone git@github.com:jianlius/git-playback.git
-git config --global alias.playback '!~/git-playback/playback.py ${GIT_PREFIX:-.}'
+pip install git-playback
 ```
 
 ## Usage

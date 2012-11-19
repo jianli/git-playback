@@ -44,15 +44,10 @@ def function(window):
     curses.init_pair(1, curses.COLOR_RED, -1)
     curses.init_pair(2, curses.COLOR_GREEN, -1)
 
-    # Because this script is run through git alias, os.getcwd() will actually
-    # return the top level of the git repo instead of the true cwd. Therefore,
-    # the alias command needs to pass in $GIT_PREFIX to get the true cwd.
-    top_level = os.getcwd()
-    file_dir = os.path.join(
-        sys.argv[1],  # $GIT_PREFIX passed in by git alias
-        sys.argv[2],  # relative path
-    )
-    repo = git.Repo(top_level, odbt=git.GitCmdObjectDB)
+    repo = git.Repo(os.getcwd(), odbt=git.GitCmdObjectDB)
+    top_level = repo.git.rev_parse(show_toplevel=True)
+    cwd = os.path.relpath(os.getcwd(), top_level)
+    file_dir = os.path.join(cwd, sys.argv[1])
 
     try:
         # Assume that file_dir is a path instead of a ref; it doesn't seem
