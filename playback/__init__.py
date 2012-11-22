@@ -72,8 +72,8 @@ def function(window):
 
     repo = git.Repo(os.getcwd(), odbt=git.GitCmdObjectDB)
     top_level = repo.git.rev_parse(show_toplevel=True)
-    cwd = os.path.relpath(os.getcwd(), top_level)
-    file_path = os.path.join(cwd, sys.argv[1])
+    file_path = os.path.relpath(os.path.join(os.getcwd(), sys.argv[1]),
+                                top_level)
 
     # `commits` is a list of `(sha1, file_path)` tuples where `file_path` is
     # variable because we are following files renames. Adding the '!' into the
