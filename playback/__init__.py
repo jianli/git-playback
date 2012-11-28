@@ -39,32 +39,6 @@ def display_prompt(window, message):
     window.addstr(max_y - 1, 0, message[:max_x - 1], curses.A_REVERSE)
 
 
-def extract_filename(log):
-    """
-    Ugly hack to extract file path from `git log --follow --numstat` output
-
-    The last line of each log entry is either (tab-separated)
-
-    1       1       bar.py
-
-    or
-
-    1       1       foo.py => bar.py
-
-    or
-
-    1       1       dir/{foo.py => bar.py}
-
-    and we want the full path of the right hand side.
-    """
-    last_line = log.strip().split('\n')[-1].split('\t')
-    assert len(last_line) == 3
-    text = last_line[-1]
-    prefix = text.split('{')[0] if ('{' in text) else ''
-    suffix = text.split('=>')[-1].strip().strip('}')
-    return prefix + suffix
-
-
 def function(window):
     curses.use_default_colors()
     curses.init_pair(1, curses.COLOR_RED, -1)
@@ -79,9 +53,8 @@ def function(window):
     # variable because we are following files renames. Adding the '!' into the
     # format is a hack to help us delimit sha1s in the git output.
     commits = [
-        (log.split()[0], extract_filename(log))
-        for log in repo.git.log(
-            file_path, numstat=True, follow=True, format='!%H')
+        (log.split()[0], log.split()[-1]) for log in
+        repo.git.log(file_path, name_status=True, follow=True, format='!%H')
         .strip('!').split('!')
     ]
     commits.reverse()  # Since `git log --reverse --follow` doesn't work
