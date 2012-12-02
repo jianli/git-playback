@@ -53,9 +53,9 @@ def function(window):
     # variable because we are following files renames. Adding the '!' into the
     # format is a hack to help us delimit sha1s in the git output.
     commits = [
-        (log.split()[0], log.split()[-1]) for log in
-        repo.git.log(file_path, name_status=True, follow=True, format='!%H')
-        .strip('!').split('!')
+        log.split('\t') for log in
+        repo.git.log(file_path, name_only=True, follow=True, format='%H!')
+        .replace('!\n\n', '\t').split('\n')
     ]
     commits.reverse()  # Since `git log --reverse --follow` doesn't work
 
