@@ -8,8 +8,11 @@ import time
 
 
 def get_text(repo, sha1, file_path):
-    return repo.git.show('%s:%s' % (sha1, file_path)).replace(
-        '\r', '').split('\n')
+    try:
+        return repo.git.show('%s:%s' % (sha1, file_path)).replace(
+            '\r', '').split('\n')
+    except git.exc.GitCommandError:
+        return []  # Assuming that the file was deleted here.
 
 
 def get_message(repo, sha1, file_path):
@@ -140,7 +143,7 @@ def playback():
     try:
         curses.wrapper(function)
     except git.exc.GitCommandError as err:
-        print >> sys.stderr, 'Error: %s' % err
+        print >> sys.stderr, '%s: %s' % (type(err).__name__, err)
         return 1
 
 
