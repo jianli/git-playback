@@ -12,7 +12,7 @@ cd ~/repo/
 git playback path/to/file.py
 ```
 
-![git playback README.md](https://raw.github.com/jianlius/git-playback/master/animation.gif "git playback README.md")
+![git playback README.md](https://raw.github.com/jianli/git-playback/master/animation.gif "git playback README.md")
 
 and then press the following keys to navigate:
 * `r`ewind
