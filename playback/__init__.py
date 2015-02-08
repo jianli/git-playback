@@ -33,8 +33,8 @@ def display_line(window, row, line, color, col_width=82):
     if display_column > 0 and (display_column + 1) * col_width > max_x:
         # Don't display additional columns if they don't completely fit.
         return False
-    window.addstr(display_row, display_column * col_width,
-                  line[:col_width], color)
+    window.addstr(
+        display_row, display_column * col_width, line[:col_width], color)
 
 
 def display_prompt(window, message):
@@ -49,8 +49,8 @@ def function(window):
 
     repo = git.Repo(os.getcwd())
     top_level = repo.git.rev_parse(show_toplevel=True)
-    file_path = os.path.relpath(os.path.join(os.getcwd(), sys.argv[1]),
-                                top_level)
+    file_path = os.path.relpath(
+        os.path.join(os.getcwd(), sys.argv[1]), top_level)
 
     # `commits` is a list of `(sha1, file_path)` tuples where `file_path` is
     # variable because we are following files renames. Adding the '!' into the
@@ -120,8 +120,9 @@ def function(window):
         old_text = get_text(repo, *commits[position - 1]) \
             if position - 1 >= 0 else []
         text = get_text(repo, *commit)
-        diff = [line for line in list(difflib.ndiff(old_text, text))
-                if line[:2] != '? ']
+        diff = [
+            line for line in list(difflib.ndiff(old_text, text))
+            if line[:2] != '? ']
 
         # `row` is the line number and `line` is the line text.
         for row, line in enumerate(diff[min(first_row, len(diff) - 1):]):
