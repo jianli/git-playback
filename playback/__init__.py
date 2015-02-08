@@ -30,8 +30,8 @@ def display_line(window, row, line, color, col_width=82):
     """
     max_y, max_x = window.getmaxyx()
     display_column, display_row = divmod(row, max_y - 1)
-    if display_column * col_width + col_width > max_x - 1:
-        # Don't display line if it doesn't completely fit on the screen.
+    if display_column > 0 and (display_column + 1) * col_width > max_x:
+        # Don't display additional columns if they don't completely fit.
         return False
     window.addstr(display_row, display_column * col_width,
                   line[:col_width], color)
