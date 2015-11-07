@@ -19,7 +19,7 @@ def get_message(repo, sha1, file_path):
     short_sha1 = sha1[:7]
     author = '(%s)' % repo.git.log(sha1, n=1, format='%ae').replace(
         '\r', '').split('\n')[0]
-    message = repo.git.log(sha1, n=1, oneline=True).replace(
+    message = repo.git.log(sha1, n=1, oneline=True, color='never').replace(
         '\r', '').split('\n')[0][8:]
     return ' '.join((short_sha1, file_path, author, message))
 
