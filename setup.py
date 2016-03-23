@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='git-playback',
-    version='0.1',
+    version='0.1.1',
     url='https://github.com/jianli/git-playback',
     description='A git command to play back file history.',
     packages=find_packages('.'),
