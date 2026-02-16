@@ -47,7 +47,7 @@ def function(window):
     curses.init_pair(1, curses.COLOR_RED, -1)
     curses.init_pair(2, curses.COLOR_GREEN, -1)
 
-    repo = git.Repo(os.getcwd())
+    repo = git.Repo(os.getcwd(), search_parent_directories=True)
     top_level = repo.git.rev_parse(show_toplevel=True)
     file_path = os.path.relpath(
         os.path.join(os.getcwd(), sys.argv[1]), top_level)
@@ -71,7 +71,7 @@ def function(window):
     rewinding = False
     diff = []
 
-    while 1:
+    while True:
         # get keyboard input
         window.nodelay(1)  # don't wait for input
         key = window.getch()

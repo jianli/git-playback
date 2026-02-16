@@ -1,0 +1,75 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+# note zest does everything, including tagging!
+- name: version-tag-changelog
+  image: python:3-bookworm
+  commands:
+  - pip install --no-cache-dir zest.releaser
+  - fullrelease --no-input
+  when:
+    branch:
+    - master
+
+- name: git-push
+  image: appleboy/drone-git-push
+  settings:
+    ssh_key:
+      from_secret: github_ssh_key
+    remote: ssh://git@github.com/${DRONE_REPO}.git
+    force: false
+    followtags: true
+  when:
+    branch:
+    - master
+
+- name: build
+  image: python:3-alpine
+  commands:
+  #- python -m pip install --upgrade build
+  - pip --no-cache-dir install build
+  - python -m build
+  # alternatively, using pipx instead of pip:
+  #- pipx install build
+  #- pyproject-build
+  when:
+    event: tag
+
+- name: github-release
+  image: plugins/github-release
+  settings:
+    api_key:
+      from_secret: github_token
+    files:
+      - dist/*
+    title: "${DRONE_TAG}"
+    #note: CHANGELOG.md
+    checksum:
+       - sha256
+  when:
+    event: tag
+
+- name: pypi-publish
+  image: plugins/pypi
+  settings:
+    username:
+      from_secret: public_pypi_username
+    password:
+      from_secret: public_pypi_password
+    skip_build: true
+    distributions:
+    - sdist
+    - bdist_wheel
+  when:
+    event: tag
+
+trigger:
+  ref:
+  - refs/heads/master
+  #- refs/heads/develop
+  - refs/heads/feature/*
+  - refs/tags/*
+

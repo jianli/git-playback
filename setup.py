@@ -1,11 +1,10 @@
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 setup(
-    name='git-playback',
-    version='0.1.1',
-    url='https://github.com/jianli/git-playback',
+    name='git-playback-ng',
+    version='0.0.1.dev0',
+    url='https://github.com/laur89/git-playback-ng',
     description='A git command to play back file history.',
     packages=find_packages('.'),
     entry_points={
@@ -14,6 +13,6 @@ setup(
         ),
     },
     install_requires=[
-        'gitpython>=0.3.2.RC1',
+        'GitPython',
     ],
 )

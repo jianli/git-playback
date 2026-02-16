@@ -1,8 +1,13 @@
-**Git playback** is a `git` command to play back or step through, commit by commit, the history of any git-controlled file. Its name was inspired by [mmozuras/git-playback](https://github.com/mmozuras/git-playback).
+**Git playback** is a `git` command to play back or step through, commit by commit,
+the history of any git-controlled file.
+
+Note this is a fork of [jianli/git-playback](https://github.com/jianli/git-playback)
+that hasn't been updated since 2016.
+
 
 ## Installation
 ```sh
-pip install git-playback
+pipx install git-playback-ng
 ```
 
 ## Usage
@@ -12,7 +17,7 @@ cd ~/repo/
 git playback path/to/file.py
 ```
 
-![git playback README.md](https://raw.github.com/jianli/git-playback/master/animation.gif "git playback README.md")
+![git playback README.md](https://raw.github.com/laur89/git-playback-ng/master/animation.gif "git playback README.md")
 
 and then press the following keys to navigate:
 * `r`ewind
