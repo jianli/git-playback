@@ -141,10 +141,13 @@ def function(window):
 
 
 def playback():
+    if len(sys.argv) < 2:
+        print('usage: git playback <file>', file=sys.stderr)
+        return 1
     try:
         curses.wrapper(function)
     except git.exc.GitCommandError as err:
-        print >> sys.stderr, '%s: %s' % (type(err).__name__, err)
+        print('%s: %s' % (type(err).__name__, err), file=sys.stderr)
         return 1
 
 
