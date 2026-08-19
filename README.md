@@ -2,7 +2,7 @@
 
 ## Installation
 ```sh
-pip install git-playback
+pip install git+https://github.com/jianli/git-playback.git
 ```
 
 ## Usage
